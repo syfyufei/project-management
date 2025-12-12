@@ -56,31 +56,10 @@ def get_project_config() -> Dict[str, Any]:
 
     # Default configuration
     return {
-        "project_types": {
-            "research-project": {
-                "description": "Academic research projects with data analysis and paper writing",
-                "required_dirs": ["claude-code", "data/raw", "data/processed", "codes/scripts", "paper/sections", "pre/literature"],
-                "optional_dirs": ["data/external", "codes/notebooks", "paper/figures", "pre/proposals"],
-                "required_files": ["README.md", ".gitignore", "project.yml", ".project-config.json"]
-            },
-            "data-analysis": {
-                "description": "Data analysis projects with ETL and reporting",
-                "required_dirs": ["claude-code", "data/raw", "data/processed", "codes/etl", "codes/analysis", "reports/drafts"],
-                "optional_dirs": ["data/exports", "codes/models", "codes/visualization", "reports/presentations"],
-                "required_files": ["README.md", ".gitignore", "project.yml", ".project-config.json"]
-            },
-            "paper-writing": {
-                "description": "Academic paper writing projects",
-                "required_dirs": ["claude-code", "data/figures", "data/tables", "codes/analysis", "paper/chapters", "pre/outlines"],
-                "optional_dirs": ["data/supplementary", "paper/sections", "pre/drafts", "pre/reviews"],
-                "required_files": ["README.md", ".gitignore", "project.yml", ".project-config.json"]
-            },
-            "general": {
-                "description": "General purpose projects with flexible structure",
-                "required_dirs": ["claude-code", "data", "codes", "paper", "pre"],
-                "optional_dirs": [],
-                "required_files": ["README.md", ".gitignore", "project.yml", ".project-config.json"]
-            }
+        "standard_structure": {
+            "description": "Standard research project structure",
+            "required_dirs": ["claude-code", "data/raw", "data/cleaned", "codes", "paper/figures", "paper/manuscripts", "pre/poster", "pre/slides"],
+            "required_files": ["README.md", ".gitignore", "project.yml", ".project-config.json"]
         },
         "validation": {
             "scoring_weights": {
@@ -104,7 +83,6 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
     Args:
         payload: Dictionary containing project creation parameters
             - project_name (str, required): Project name in kebab-case
-            - project_type (str, required): Type of project
             - root (str, optional): Root directory path
             - git_init (bool, optional): Initialize Git repository
             - force (bool, optional): Overwrite existing directory
@@ -117,7 +95,6 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
     try:
         # Validate required parameters
         project_name = payload.get('project_name')
-        project_type = payload.get('project_type')
 
         if not project_name:
             raise CreationError("project_name is required")
@@ -125,19 +102,14 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         if not validate_project_name(project_name):
             raise CreationError(f"Invalid project name '{project_name}'. Must be kebab-case.")
 
-        if not project_type:
-            raise CreationError("project_type is required")
-
         config = get_project_config()
-        if project_type not in config['project_types']:
-            raise CreationError(f"Unknown project type '{project_type}'. Available: {list(config['project_types'].keys())}")
 
         # Set default values
         root = payload.get('root', os.getcwd())
         git_init = payload.get('git_init', True)
         force = payload.get('force', False)
         author_name = payload.get('author_name', config['templates']['default_author'])
-        description = payload.get('description', f"A {project_type} created by Project Management skill")
+        description = payload.get('description', f"A research project created by Project Management skill")
 
         # Create project path
         project_path = Path(root) / project_name
@@ -147,7 +119,7 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
             raise CreationError(f"Project directory '{project_path}' already exists. Use force=True to overwrite.")
 
         # Create project directory structure
-        project_type_config = config['project_types'][project_type]
+        structure_config = config['standard_structure']
         created_dirs = []
 
         # Create project root
@@ -155,13 +127,7 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         created_dirs.append(str(project_path))
 
         # Create required directories
-        for dir_path in project_type_config['required_dirs']:
-            full_path = project_path / dir_path
-            full_path.mkdir(parents=True, exist_ok=True)
-            created_dirs.append(str(full_path))
-
-        # Create optional directories
-        for dir_path in project_type_config.get('optional_dirs', []):
+        for dir_path in structure_config['required_dirs']:
             full_path = project_path / dir_path
             full_path.mkdir(parents=True, exist_ok=True)
             created_dirs.append(str(full_path))
@@ -170,7 +136,6 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         created_files = []
         template_vars = {
             'project_name': project_name,
-            'project_type': project_type,
             'author_name': author_name,
             'description': description,
             'creation_date': datetime.now().strftime('%Y-%m-%d'),
@@ -198,7 +163,6 @@ def create_project(payload: Dict[str, Any]) -> Dict[str, Any]:
             'message': f"Project '{project_name}' created successfully",
             'data': {
                 'project_path': str(project_path),
-                'project_type': project_type,
                 'created_directories': created_dirs,
                 'created_files': created_files,
                 'git_initialized': git_initialized
@@ -227,7 +191,6 @@ def restructure_project(payload: Dict[str, Any]) -> Dict[str, Any]:
             - backup (bool, optional): Create backup before restructuring
             - remove_nonstandard (bool, optional): Remove non-standard directories
             - force (bool, optional): Force restructuring without confirmation
-            - target_type (str, optional): Target project type
 
     Returns:
         Dict containing operation result with success status and details
@@ -238,7 +201,6 @@ def restructure_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         backup = payload.get('backup', True)
         remove_nonstandard = payload.get('remove_nonstandard', True)
         force = payload.get('force', False)
-        target_type = payload.get('target_type')
 
         project_path = Path(root).resolve()
 
@@ -257,19 +219,12 @@ def restructure_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         existing_dirs = [d for d in project_path.iterdir() if d.is_dir()]
         existing_files = [f for f in project_path.iterdir() if f.is_file()]
 
-        # Auto-detect project type if not provided
-        if not target_type:
-            target_type = _detect_project_type(project_path)
-
-        if not target_type:
-            target_type = "general"  # fallback to general type
-
         config = get_project_config()
-        project_type_config = config['project_types'][target_type]
+        structure_config = config['standard_structure']
 
         # Create missing standard directories
         created_dirs = []
-        for dir_path in project_type_config['required_dirs']:
+        for dir_path in structure_config['required_dirs']:
             full_path = project_path / dir_path
             if not full_path.exists():
                 full_path.mkdir(parents=True, exist_ok=True)
@@ -283,8 +238,7 @@ def restructure_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         # Remove nonstandard directories if requested
         removed_dirs = []
         if remove_nonstandard:
-            all_standard_dirs = set(project_type_config['required_dirs'] +
-                                  project_type_config.get('optional_dirs', []))
+            all_standard_dirs = set(structure_config['required_dirs'])
 
             for existing_dir in existing_dirs:
                 if existing_dir.name not in all_standard_dirs and existing_dir.name not in ['.git', '.claude', '.claude-plugin']:
@@ -294,7 +248,6 @@ def restructure_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         # Update or create project configuration files
         template_vars = {
             'project_name': project_path.name,
-            'project_type': target_type,
             'restructure_date': datetime.now().strftime('%Y-%m-%d'),
             'year': datetime.now().year
         }
@@ -308,8 +261,7 @@ def restructure_project(payload: Dict[str, Any]) -> Dict[str, Any]:
                 'backup_path': str(backup_path) if backup_path else None,
                 'moved_files': moved_files,
                 'created_directories': created_dirs,
-                'removed_directories': removed_dirs,
-                'project_type': target_type
+                'removed_directories': removed_dirs
             },
             'errors': [],
             'warnings': [] if not backup_path else [f"Backup created at {backup_path}"]
@@ -349,25 +301,18 @@ def validate_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         if not project_path.exists():
             raise ValidationError(f"Project directory '{project_path}' does not exist")
 
-        # Auto-detect project type
-        project_type = _detect_project_type(project_path)
-        if not project_type:
-            project_type = "general"
-
         config = get_project_config()
-        project_type_config = config['project_types'][project_type]
+        structure_config = config['standard_structure']
 
         # Validate directory structure
-        required_dirs = project_type_config['required_dirs']
-        optional_dirs = project_type_config.get('optional_dirs', [])
-        existing_dirs = [d.name for d in project_path.iterdir() if d.is_dir()]
+        required_dirs = structure_config['required_dirs']
+        existing_dirs = [str(d.relative_to(project_path)) for d in project_path.iterdir() if d.is_dir()]
 
         missing_dirs = [d for d in required_dirs if d not in existing_dirs]
-        extra_dirs = [d for d in existing_dirs if d not in required_dirs + optional_dirs +
-                     ['.git', '.claude', '.claude-plugin', '__pycache__']]
+        extra_dirs = [d for d in existing_dirs if d not in required_dirs + ['.git', '.claude', '.claude-plugin', '__pycache__']]
 
         # Validate required files
-        required_files = project_type_config['required_files']
+        required_files = structure_config['required_files']
         existing_files = [f.name for f in project_path.iterdir() if f.is_file()]
 
         missing_files = [f for f in required_files if f not in existing_files]
@@ -420,7 +365,6 @@ def validate_project(payload: Dict[str, Any]) -> Dict[str, Any]:
             # Create missing files
             template_vars = {
                 'project_name': project_path.name,
-                'project_type': project_type,
                 'validation_date': datetime.now().strftime('%Y-%m-%d'),
                 'year': datetime.now().year
             }
@@ -432,7 +376,6 @@ def validate_project(payload: Dict[str, Any]) -> Dict[str, Any]:
             'message': 'Validation completed',
             'data': {
                 'compliance_score': compliance_score,
-                'project_type': project_type,
                 'structure_analysis': {
                     'required_dirs_present': [d for d in required_dirs if d in existing_dirs],
                     'required_files_present': [f for f in required_files if f in existing_files],
@@ -480,11 +423,6 @@ def get_project_status(payload: Dict[str, Any]) -> Dict[str, Any]:
 
         # Get basic project info
         project_name = project_path.name
-
-        # Auto-detect project type
-        project_type = _detect_project_type(project_path)
-        if not project_type:
-            project_type = "general"
 
         # Get modification time
         last_modified = datetime.fromtimestamp(project_path.stat().st_mtime)
@@ -559,7 +497,6 @@ def get_project_status(payload: Dict[str, Any]) -> Dict[str, Any]:
                 'project_info': {
                     'name': project_name,
                     'path': str(project_path),
-                    'type': project_type,
                     'last_modified': last_modified.isoformat()
                 },
                 'structure_stats': {
@@ -584,27 +521,7 @@ def get_project_status(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 # Helper functions
 
-def _detect_project_type(project_path: Path) -> Optional[str]:
-    """Auto-detect project type based on existing structure"""
-    config = get_project_config()
-
-    # Simple heuristic: check which project type has the most matching directories
-    best_match = None
-    best_score = 0
-
-    for project_type, type_config in config['project_types'].items():
-        required_dirs = type_config['required_dirs']
-        existing_dirs = [d.name for d in project_path.iterdir() if d.is_dir()]
-
-        # Count matching directories
-        matches = sum(1 for dir_name in required_dirs if dir_name in existing_dirs)
-        score = matches / len(required_dirs)
-
-        if score > best_score:
-            best_score = score
-            best_match = project_type
-
-    return best_match if best_score > 0.3 else None  # Threshold for detection
+# Helper function for project type detection removed - not needed with single structure
 
 
 def _generate_template_files(project_path: Path, template_vars: Dict[str, Any],
@@ -619,16 +536,23 @@ def _generate_template_files(project_path: Path, template_vars: Dict[str, Any],
 
 {{{{description}}}}
 
-## Project Type
-{{{{project_type}}}}
-
 ## Directory Structure
 
-- `claude-code/` - Claude Code conversation history and prompts
-- `data/` - Data files (raw and processed)
-- `codes/` - Analysis scripts and code
-- `paper/` - Paper-related content
-- `pre/` - Preliminary work and planning
+```
+├── claude-code/           # Claude Code 对话记录和原始信息
+├── data/                  # 数据存储
+│   ├── raw/               # 原始数据文件
+│   └── cleaned/           # 清洗后的数据
+├── codes/                 # 代码和分析脚本
+├── paper/                 # 论文相关文件
+│   ├── figures/           # 图表和图片
+│   └── manuscripts/       # 论文草稿
+├── pre/                   # 演示材料
+│   ├── poster/            # 海报文件
+│   └── slides/            # 演示文稿
+├── README.md              # 项目说明文档
+└── .gitignore             # Git 忽略文件配置
+```
 
 ## Created
 - Date: {{{{creation_date}}}}
@@ -692,7 +616,6 @@ config/local.*
 """,
         'project.yml': f"""project:
   name: {{{{project_name}}}}
-  type: {{{{project_type}}}}
   description: {{{{description}}}}
   created: {{{{creation_date}}}}
   author: {{{{author_name}}}}
@@ -700,16 +623,25 @@ config/local.*
 directories:
   claude_code: claude-code
   data: data
+  data_raw: data/raw
+  data_cleaned: data/cleaned
   codes: codes
   paper: paper
+  paper_figures: paper/figures
+  paper_manuscripts: paper/manuscripts
   pre: pre
+  pre_poster: pre/poster
+  pre_slides: pre/slides
 
 structure:
   - claude-code
-  - data
+  - data/raw
+  - data/cleaned
   - codes
-  - paper
-  - pre
+  - paper/figures
+  - paper/manuscripts
+  - pre/poster
+  - pre/slides
 
 metadata:
   version: 0.1.0
@@ -717,12 +649,21 @@ metadata:
 """,
         '.project-config.json': f"""{{
   "project_name": "{{{{project_name}}}}",
-  "project_type": "{{{{project_type}}}}",
   "created_at": "{{{{creation_date}}}}",
   "author": "{{{{author_name}}}}",
   "description": "{{{{description}}}}",
   "version": "0.1.0",
   "structure_version": "1.0",
+  "directories": [
+    "claude-code",
+    "data/raw",
+    "data/cleaned",
+    "codes",
+    "paper/figures",
+    "paper/manuscripts",
+    "pre/poster",
+    "pre/slides"
+  ],
   "config": {{
     "backup_enabled": true,
     "auto_validate": true,

@@ -7,7 +7,7 @@ description: Comprehensive project management skill for creating, restructuring,
 
 ## Overview
 
-A TDD-tested project management skill that creates, restructures, validates, and monitors research projects with standardized directory structures. Supports 4 project types: research-project, data-analysis, paper-writing, and general.
+A TDD-tested project management skill that creates, restructures, validates, and monitors research projects with a standardized directory structure. Uses a single default structure optimized for research projects.
 
 ## When to Use This Skill
 
@@ -33,7 +33,6 @@ A TDD-tested project management skill that creates, restructures, validates, and
 ```json
 {
   "project_name": "string (kebab-case, required)",
-  "project_type": "string (required, one of: research-project, data-analysis, paper-writing, general)",
   "root": "string (optional, default: current directory)",
   "git_init": "boolean (optional, default: true)",
   "force": "boolean (optional, default: false)",
@@ -44,11 +43,10 @@ A TDD-tested project management skill that creates, restructures, validates, and
 
 **Behavior**:
 1. Validates project_name format (kebab-case)
-2. Validates project_type against allowed values
-3. Creates standardized directory structure based on type
-4. Generates template files with variable substitution
-5. Initializes Git repository if git_init=true
-6. Creates project configuration files
+2. Creates standardized directory structure with default research project layout
+3. Generates template files with variable substitution
+4. Initializes Git repository if git_init=true
+5. Creates project configuration files
 
 **Output Structure**:
 ```json
@@ -57,8 +55,7 @@ A TDD-tested project management skill that creates, restructures, validates, and
   "message": "Project 'ai-ethics-research' created successfully",
   "data": {
     "project_path": "/full/path/to/project",
-    "project_type": "research-project",
-    "created_directories": ["claude-code", "data", "codes", "paper", "pre"],
+    "created_directories": ["claude-code", "data/raw", "data/cleaned", "codes", "paper/figures", "paper/manuscripts", "pre/poster", "pre/slides"],
     "created_files": ["README.md", ".gitignore", "project.yml", ".project-config.json"],
     "git_initialized": true
   },
@@ -69,8 +66,8 @@ A TDD-tested project management skill that creates, restructures, validates, and
 
 **Example Usage**:
 ```
-User: "Create a new research project called AI Ethics Research"
-Assistant: [Uses create_project with project_name="ai-ethics-research", project_type="research-project"]
+User: "Create a new project called AI Ethics Research"
+Assistant: [Uses create_project with project_name="ai-ethics-research"]
 ```
 
 ### restructure_project
@@ -83,16 +80,15 @@ Assistant: [Uses create_project with project_name="ai-ethics-research", project_
   "root": "string (optional, default: current directory)",
   "backup": "boolean (optional, default: true)",
   "remove_nonstandard": "boolean (optional, default: true)",
-  "force": "boolean (optional, default: false)",
-  "target_type": "string (optional, auto-detect if not provided)"
+  "force": "boolean (optional, default: false)"
 }
 ```
 
 **Behavior**:
 1. Creates project backup if backup=true
 2. Analyzes existing project structure
-3. Moves/reorganizes files to standard structure
-4. Creates missing standard directories
+3. Moves/reorganizes files to standard research project structure
+4. Creates missing standard directories (claude-code, data/raw, data/cleaned, codes, paper/figures, paper/manuscripts, pre/poster, pre/slides)
 5. Removes nonstandard directories if remove_nonstandard=true
 6. Updates project configuration files
 
@@ -104,9 +100,8 @@ Assistant: [Uses create_project with project_name="ai-ethics-research", project_
   "data": {
     "backup_path": "/path/to/backup",
     "moved_files": ["old/path → new/path"],
-    "created_directories": ["missing/dirs"],
-    "removed_directories": ["nonstandard/dirs"],
-    "project_type": "research-project"
+    "created_directories": ["claude-code", "data/raw", "data/cleaned", "codes", "paper/figures", "paper/manuscripts", "pre/poster", "pre/slides"],
+    "removed_directories": ["nonstandard/dirs"]
   }
 }
 ```
@@ -131,7 +126,7 @@ Assistant: [Uses restructure_project with backup=true]
 ```
 
 **Behavior**:
-1. Checks standard directory structure compliance
+1. Checks standard research project directory structure compliance
 2. Validates required files exist and are properly formatted
 3. Evaluates project structure completeness
 4. Calculates compliance score (0-100)
@@ -145,15 +140,14 @@ Assistant: [Uses restructure_project with backup=true]
   "message": "Validation completed",
   "data": {
     "compliance_score": 85,
-    "project_type": "research-project",
     "structure_analysis": {
-      "required_dirs_present": ["claude-code", "data", "codes", "paper", "pre"],
+      "required_dirs_present": ["claude-code", "data", "data/raw", "data/cleaned", "codes", "paper", "paper/figures", "paper/manuscripts", "pre", "pre/poster", "pre/slides"],
       "required_files_present": ["README.md", ".gitignore", "project.yml"],
-      "missing_items": [],
+      "missing_items": ["data/raw"],
       "extra_items": ["temp"]
     },
-    "issues_found": ["Extra directory 'temp' found"],
-    "suggestions": ["Remove 'temp' directory or move to appropriate location"]
+    "issues_found": ["Missing required directory 'data/raw'", "Extra directory 'temp' found"],
+    "suggestions": ["Create 'data/raw' directory", "Remove 'temp' directory or move to appropriate location"]
   }
 }
 ```
@@ -194,7 +188,6 @@ Assistant: [Uses validate_project with strict_mode=true]
     "project_info": {
       "name": "ai-ethics-research",
       "path": "/full/path/to/project",
-      "type": "research-project",
       "last_modified": "2025-12-11T16:30:00Z"
     },
     "structure_stats": {
@@ -204,9 +197,11 @@ Assistant: [Uses validate_project with strict_mode=true]
       "compliance_score": 92
     },
     "file_breakdown": {
+      "claude-code/": {"files": 5, "size_mb": 1.2},
       "data/": {"files": 12, "size_mb": 89.2},
       "codes/": {"files": 18, "size_mb": 2.8},
-      "paper/": {"files": 8, "size_mb": 35.5}
+      "paper/": {"files": 8, "size_mb": 35.5},
+      "pre/": {"files": 3, "size_mb": 8.7}
     },
     "git_info": {
       "commits": 23,
@@ -219,24 +214,34 @@ Assistant: [Uses validate_project with strict_mode=true]
 
 **Example Usage**:
 ```
-User: "Show me the current status of my research project"
+User: "Show me the current status of my project"
 Assistant: [Uses project_status with include_git=true]
 ```
 
 ## Configuration
 
 **Configuration Options**:
-- **default_project_type**: "research-project" - Default type when not specified
-- **standard_directories**: ["claude-code", "data", "codes", "paper", "pre"] - Core directory structure
+- **standard_directories**: ["claude-code", "data/raw", "data/cleaned", "codes", "paper/figures", "paper/manuscripts", "pre/poster", "pre/slides"] - Standard directory structure
 - **template_variables**: Customizable variables for template generation
 - **validation_weights**: Scoring weights for compliance calculation
 - **backup_location**: ".backup" - Default backup directory for restructure operations
 
-**Project Type Configurations**:
-- **research-project**: Includes literature, data processing, manuscript sections
-- **data-analysis**: Includes ETL, models, reports, presentations
-- **paper-writing**: Includes chapters, sections, bibliography, reviews
-- **general**: Flexible structure with basic organization
+**Standard Directory Structure**:
+```
+├── claude-code/           # Claude Code 对话记录和原始信息
+├── data/                  # 数据存储
+│   ├── raw/               # 原始数据文件
+│   └── cleaned/           # 清洗后的数据
+├── codes/                 # 代码和分析脚本
+├── paper/                 # 论文相关文件
+│   ├── figures/           # 图表和图片
+│   └── manuscripts/       # 论文草稿
+├── pre/                   # 演示材料
+│   ├── poster/            # 海报文件
+│   └── slides/            # 演示文稿
+├── README.md              # 项目说明文档
+└── .gitignore             # Git 忽略文件配置
+```
 
 ## Best Practices
 
@@ -259,10 +264,10 @@ Assistant: [Uses project_status with include_git=true]
 
 ### Create Complete Project Workflow
 ```
-1. User: "Create a data analysis project for customer behavior"
-2. System: Uses create_project with type="data-analysis"
-3. System: Generates standard structure with analysis directories
-4. System: Creates templates for data processing and reporting
+1. User: "Create a project for customer behavior analysis"
+2. System: Uses create_project with project_name="customer-behavior-analysis"
+3. System: Generates standard research project structure
+4. System: Creates templates for data processing and documentation
 5. Result: Ready-to-use project structure
 ```
 
@@ -277,7 +282,7 @@ Assistant: [Uses project_status with include_git=true]
 
 ### Validate and Monitor
 ```
-1. User: "Check if our research project meets standards"
+1. User: "Check if our project meets standards"
 2. System: Uses validate_project with strict_mode
 3. System: Provides compliance score and detailed report
 4. System: Suggests specific improvements

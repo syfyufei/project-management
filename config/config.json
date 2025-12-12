@@ -1,95 +1,22 @@
 {
-  "project_types": {
-    "research-project": {
-      "description": "Academic research projects with data analysis and paper writing",
-      "required_dirs": [
-        "claude-code",
-        "data/raw",
-        "data/processed",
-        "codes/scripts",
-        "paper/sections",
-        "pre/literature"
-      ],
-      "optional_dirs": [
-        "data/external",
-        "codes/notebooks",
-        "paper/figures",
-        "pre/proposals",
-        "pre/notes"
-      ],
-      "required_files": [
-        "README.md",
-        ".gitignore",
-        "project.yml",
-        ".project-config.json"
-      ]
-    },
-    "data-analysis": {
-      "description": "Data analysis projects with ETL and reporting",
-      "required_dirs": [
-        "claude-code",
-        "data/raw",
-        "data/processed",
-        "codes/etl",
-        "codes/analysis",
-        "reports/drafts"
-      ],
-      "optional_dirs": [
-        "data/exports",
-        "codes/models",
-        "codes/visualization",
-        "reports/presentations",
-        "reports/final"
-      ],
-      "required_files": [
-        "README.md",
-        ".gitignore",
-        "project.yml",
-        ".project-config.json"
-      ]
-    },
-    "paper-writing": {
-      "description": "Academic paper writing projects",
-      "required_dirs": [
-        "claude-code",
-        "data/figures",
-        "data/tables",
-        "codes/analysis",
-        "paper/chapters",
-        "pre/outlines"
-      ],
-      "optional_dirs": [
-        "data/supplementary",
-        "paper/sections",
-        "paper/front-matter",
-        "paper/back-matter",
-        "pre/drafts",
-        "pre/reviews"
-      ],
-      "required_files": [
-        "README.md",
-        ".gitignore",
-        "project.yml",
-        ".project-config.json"
-      ]
-    },
-    "general": {
-      "description": "General purpose projects with flexible structure",
-      "required_dirs": [
-        "claude-code",
-        "data",
-        "codes",
-        "paper",
-        "pre"
-      ],
-      "optional_dirs": [],
-      "required_files": [
-        "README.md",
-        ".gitignore",
-        "project.yml",
-        ".project-config.json"
-      ]
-    }
+  "standard_structure": {
+    "description": "Standard research project structure",
+    "required_dirs": [
+      "claude-code",
+      "data/raw",
+      "data/cleaned",
+      "codes",
+      "paper/figures",
+      "paper/manuscripts",
+      "pre/poster",
+      "pre/slides"
+    ],
+    "required_files": [
+      "README.md",
+      ".gitignore",
+      "project.yml",
+      ".project-config.json"
+    ]
   },
   "validation": {
     "scoring_weights": {
@@ -133,7 +60,6 @@
     }
   },
   "defaults": {
-    "project_type": "research-project",
     "git_init": true,
     "create_backup": true,
     "strict_validation": false,
