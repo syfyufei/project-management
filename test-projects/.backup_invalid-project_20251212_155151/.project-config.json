@@ -1,0 +1,31 @@
+{
+  "project": {
+    "name": "invalid-project",
+    "type": "research-project",
+    "path": "/Users/adrian/Documents/GitHub/project-management/project-management/test-projects/invalid-project",
+    "created": "2025-12-12T00:45:00Z",
+    "last_modified": "2025-12-12T00:45:00Z",
+    "version": "0.1.0"
+  },
+  "structure": {
+    "required_directories": [],
+    "required_files": [],
+    "compliance_score": 0
+  },
+  "configuration": {
+    "git_initialized": false,
+    "backup_enabled": true,
+    "auto_validation": true
+  },
+  "metadata": {
+    "author": "Test",
+    "email": "test@example.com",
+    "description": "Invalid project structure for testing",
+    "tags": ["test", "invalid"]
+  },
+  "skill_info": {
+    "created_by": "manual",
+    "skill_version": "0.1.0",
+    "template": "none"
+  }
+}

@@ -1,0 +1,37 @@
+# Data Analysis Project Structure Template
+
+project_type: data-analysis
+description: Data analysis projects with ETL and reporting
+
+required_directories:
+  - claude-code
+  - data/raw
+  - data/processed
+  - codes/etl
+  - codes/analysis
+  - reports/drafts
+
+optional_directories:
+  - data/exports
+  - codes/models
+  - codes/visualization
+  - reports/presentations
+  - reports/final
+
+required_files:
+  - README.md
+  - .gitignore
+  - project.yml
+  - .project-config.json
+
+special_files:
+  - data/raw/.gitkeep
+  - data/processed/.gitkeep
+  - reports/drafts/.gitkeep
+
+description: |
+  A data analysis project structure optimized for analytical workflows with:
+  - Raw and processed data management
+  - ETL (Extract, Transform, Load) scripts
+  - Analysis code and models
+  - Report generation and presentations

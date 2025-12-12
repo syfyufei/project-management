@@ -1,0 +1,35 @@
+{
+  "project": {
+    "name": "complex-nested-project",
+    "type": "general",
+    "path": "/Users/adrian/Documents/GitHub/project-management/project-management/test-projects/complex-nested-project",
+    "created": "2025-12-12T15:55:00Z",
+    "last_modified": "2025-12-12T15:52:24.277211",
+    "version": "0.1.0"
+  },
+  "structure": {
+    "required_directories": [],
+    "required_files": [],
+    "compliance_score": 0
+  },
+  "configuration": {
+    "git_initialized": false,
+    "backup_enabled": true,
+    "auto_validation": true
+  },
+  "metadata": {
+    "author": "Pressure Test",
+    "email": "test@example.com",
+    "description": "Complex nested project for pressure testing",
+    "tags": [
+      "complex",
+      "nested",
+      "pressure-test"
+    ]
+  },
+  "skill_info": {
+    "created_by": "manual-complex",
+    "skill_version": "0.1.0",
+    "template": "none"
+  }
+}

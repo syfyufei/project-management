@@ -1,0 +1,31 @@
+{
+  "project": {
+    "name": "ai-ethics-research",
+    "type": "research-project",
+    "path": "/Users/adrian/Documents/GitHub/project-management/project-management/test-projects/ai-ethics-research",
+    "created": "2025-12-12T00:37:00Z",
+    "last_modified": "2025-12-12T00:37:00Z",
+    "version": "0.1.0"
+  },
+  "structure": {
+    "standard_directories": ["claude-code", "data", "codes", "paper", "pre"],
+    "required_files": ["README.md", ".gitignore", "project.yml"],
+    "compliance_score": 100
+  },
+  "configuration": {
+    "git_initialized": false,
+    "backup_enabled": true,
+    "auto_validation": true
+  },
+  "metadata": {
+    "author": "Adrian",
+    "email": "sunyf20@mails.tsinghua.edu.cn",
+    "description": "Focusing on ethical considerations in artificial intelligence development",
+    "tags": ["ai", "ethics", "research"]
+  },
+  "skill_info": {
+    "created_by": "project-management",
+    "skill_version": "0.1.0",
+    "template": "research-project-standard"
+  }
+}

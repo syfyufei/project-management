@@ -1,0 +1,33 @@
+project:
+  name: ai-ethics-research
+  type: research-project
+  description: "Focusing on ethical considerations in artificial intelligence development"
+  author: "Adrian"
+  email: "sunyf20@mails.tsinghua.edu.cn"
+  created: "2025-12-12"
+  version: "0.1.0"
+
+structure:
+  standard_directories:
+    - claude-code
+    - data
+    - codes
+    - paper
+    - pre
+
+  templates_used:
+    - research-project-standard
+
+configuration:
+  git_initialized: false
+  backup_enabled: true
+  validation_score: 100
+
+metadata:
+  last_validated: "2025-12-12"
+  compliance_score: 100
+  project_status: "active"
+
+notes:
+  - "Project created using Project Management skill"
+  - "Standard research project structure applied"

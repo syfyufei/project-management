@@ -1,0 +1,33 @@
+# General Project Structure Template
+
+project_type: general
+description: General purpose projects with flexible structure
+
+required_directories:
+  - claude-code
+  - data
+  - codes
+  - paper
+  - pre
+
+optional_directories: []
+
+required_files:
+  - README.md
+  - .gitignore
+  - project.yml
+  - .project-config.json
+
+special_files:
+  - data/.gitkeep
+  - codes/.gitkeep
+  - paper/.gitkeep
+  - pre/.gitkeep
+
+description: |
+  A general purpose project structure with basic organization:
+  - Claude Code conversation history
+  - Data files and resources
+  - Code and scripts
+  - Documentation and papers
+  - Preliminary work and planning

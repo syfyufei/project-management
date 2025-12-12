@@ -1,0 +1,41 @@
+project:
+  name: customer-behavior-analysis
+  type: data-analysis
+  description: "Analyzes customer behavior patterns to derive actionable insights for business decisions"
+  author: "Adrian"
+  email: "sunyf20@mails.tsinghua.edu.cn"
+  created: "2025-12-12"
+  version: "0.1.0"
+
+structure:
+  required_directories:
+    - claude-code
+    - data/raw
+    - data/processed
+    - codes/etl
+    - codes/analysis
+    - reports/drafts
+
+  optional_directories:
+    - data/exports
+    - codes/models
+    - codes/visualization
+    - reports/presentations
+    - reports/final
+
+  templates_used:
+    - data-analysis-standard
+
+configuration:
+  git_initialized: false
+  backup_enabled: true
+  validation_score: 100
+
+metadata:
+  last_validated: "2025-12-12"
+  compliance_score: 100
+  project_status: "active"
+
+notes:
+  - "Project created using Project Management skill"
+  - "Data analysis structure with ETL pipeline"

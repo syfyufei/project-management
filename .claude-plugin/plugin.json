@@ -1,0 +1,21 @@
+{
+  "name": "project-management",
+  "version": "0.1.0",
+  "description": "Comprehensive project management skill for creating, restructuring, validating, and monitoring research and analysis projects",
+  "author": {
+    "name": "Adrian",
+    "email": "sunyf20@mails.tsinghua.edu.cn"
+  },
+  "repository": "https://github.com/syfyufei/project-management",
+  "keywords": [],
+  "license": "MIT",
+  "skills": [
+    "./skills/project-management.md"
+  ],
+  "commands": [
+    "./.claude/commands/create.md",
+    "./.claude/commands/restructure.md",
+    "./.claude/commands/validate.md",
+    "./.claude/commands/status.md"
+  ]
+}
